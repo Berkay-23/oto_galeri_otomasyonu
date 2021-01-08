@@ -45,20 +45,33 @@ namespace OtoGalari_otomasyonu
 
             while (reader.Read())
             {
-                // Panel ekle fonksiyonuna iki panel arası uzaklık ve panelin etiketini gönderiyoruz.
-                PanelEkle(i, reader[0].ToString());
+                try
+                {
+                    // Panel ekle fonksiyonuna iki panel arası uzaklık ve panelin etiketini gönderiyoruz.
+                    PanelEkle(i, reader[0].ToString());
 
-                // Labellara içide yazılacak yazıyı, x ve y koordinatlarını gönderiyoruz.
-                LabelEkle(reader[2].ToString() + " " + reader[3].ToString(), 115, 15); // Marka + Model yazdırılacak
-                LabelEkle(reader[5].ToString(), 115, 65); // Şanzıman yazdırılacak
-                LabelEkle(reader[6].ToString(), 115, 40); // Aracın Durumu yazdırılacak
-                LabelEkle(BasamakAyir(Convert.ToInt32(reader[11])) + " km", 250, 40); // Aracın kilometre bilgisini yazdıracak 
-                LabelEkle(BasamakAyir(Convert.ToInt32(reader[12])) + " ₺", 250, 65); // Aracın fiyat bilgisini yazdıracak
+                    // Labellara içide yazılacak yazıyı, x ve y koordinatlarını gönderiyoruz.
+                    LabelEkle(reader[2].ToString() + " " + reader[3].ToString(), 115, 15); // Marka + Model yazdırılacak
+                    LabelEkle(reader[5].ToString(), 115, 65); // Şanzıman yazdırılacak
+                    LabelEkle(reader[6].ToString(), 115, 40); // Aracın Durumu yazdırılacak
+                    LabelEkle(BasamakAyir(Convert.ToInt32(reader[11])) + " km", 250, 40); // Aracın kilometre bilgisini yazdıracak 
+                    LabelEkle(BasamakAyir(Convert.ToInt32(reader[12])) + " ₺", 250, 65); // Aracın fiyat bilgisini yazdıracak
 
-                // Picturebox'a databaseden gelen byte dizisi halindeki resimi Image formatına çevirerek yolluyoruz.
-                PictureBoxEkle(ByteArrayToImage((byte[])reader[14]));
+                    // Picturebox'a databaseden gelen byte dizisi halindeki resimi Image formatına çevirerek yolluyoruz.
+                    PictureBoxEkle(ByteArrayToImage((byte[])reader[14]));
 
-                i = i + 1;
+                    i = i + 1;
+
+                }
+                catch(Exception excp)
+                {
+                    DialogResult result = MessageBox.Show(excp.Message, "Hay Aksi Hatayla karşılaşıldı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.OK)
+                    {
+                        Application.Restart();
+                    }
+                }
             }
             database.Disconnect();
 
@@ -120,7 +133,22 @@ namespace OtoGalari_otomasyonu
         {
             // byte dizisi tipinde aldığı değişkeni image formatına çeviriyor
             var memoryStream = new MemoryStream(byteArrayIn);
-            Image returnImage = Image.FromStream(memoryStream);
+            Image returnImage = null;
+
+            try
+            {
+                returnImage = Image.FromStream(memoryStream);
+            }
+            catch (Exception excp)
+            {
+                DialogResult result = MessageBox.Show(excp.Message, "Hay Aksi Hatayla karşılaşıldı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                if (DialogResult.OK == result)
+                {
+                    Application.Restart();
+                }
+                
+            }
             return returnImage;
         }
         private string BasamakAyir(int sayi) // İlan üzerindeki kilometre ve fiyat bilgilerini noktayla ayırıyor

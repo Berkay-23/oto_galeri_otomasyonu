@@ -226,7 +226,23 @@ namespace OtoGalari_otomasyonu
         {
             // byte dizisi tipinde aldığı değişkeni image formatına çeviriyor
             var memoryStream = new MemoryStream(byteArrayIn);
-            Image returnImage = Image.FromStream(memoryStream);
+            Image returnImage = null;
+
+            try
+            {
+                returnImage = Image.FromStream(memoryStream);
+            }
+            catch (Exception excp)
+            {
+                DialogResult result = MessageBox.Show(excp.Message, "Hay Aksi Hatayla karşılaşıldı", MessageBoxButtons.OK , MessageBoxIcon.Warning);
+
+                if (DialogResult.OK == result)
+                {
+                    Application.Restart();
+                }
+
+            }
+
             return returnImage;
         }
         public static byte[] ImageToByteArray(Image imageIn)
